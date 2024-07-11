@@ -7,13 +7,12 @@ import jwt
 import hashlib
 
 from base.responses import SuccessPutResponse, BadPutResponse, SuccessGetResponse, \
-    BadGetResponse
+    BadGetResponse, SuccessDeleteResponse, BadDeleteResponse
 from .serializers import RegisterSerializer, LoginSerializer, UsersSerializer, \
     UsersPasswordUpdateSerializer
 from .models import Users
 from database import session_maker
 from authentication.dependencies import role_required
-from base.BaseViewSet import BaseViewSet
 from .UsersDAO import UsersDAO
 
 
@@ -88,15 +87,28 @@ class UsersView(APIView):
 
     @role_required(5)
     def get(self, request, *args, **kwargs):
-        pk = kwargs.get('id')
-        if pk is None:
-            users = UsersDAO.find_all(Users)
-            serializer = self.serializer_class(users, many=True)
-            return SuccessGetResponse(data=serializer.data)
-        else:
-            result = UsersDAO.find_by_id(Users, pk)
-            if result is None:
-                return BadGetResponse(data=[])
-            serializer = self.serializer_class(result[0])
-            return SuccessGetResponse(data=serializer.data)
+        users = UsersDAO.find_all(Users)
+        serializer = self.serializer_class(users, many=True)
+        return SuccessGetResponse(data=serializer.data)
 
+
+class UsersViewWithParam(APIView):
+    serializer_class = UsersSerializer
+
+    @role_required(5)
+    def get(self, request, *args, **kwargs):
+        pk = kwargs.get('id')
+        result = UsersDAO.find_by_id(Users, pk)
+        if result is None:
+            return BadGetResponse(data=[])
+        serializer = self.serializer_class(result[0])
+        return SuccessGetResponse(data=serializer.data)
+
+    @role_required(5)
+    def delete(self, request, *args, **kwargs):
+        pk = kwargs.get('id')
+        user = UsersDAO.find_by_id(Users, pk)
+        if not user:
+            return BadDeleteResponse()
+        UsersDAO.delete(Users, pk)
+        return SuccessDeleteResponse()

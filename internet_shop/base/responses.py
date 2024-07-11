@@ -91,18 +91,26 @@ class BadPatchResponse(ApiResponse):
 class SuccessDeleteResponse(ApiResponse):
     def __init__(
             self,
-            data,
+            data = None,
             status_code: status = status.HTTP_200_OK,
             **kwargs
     ):
-        super().__init__(data, status_code, **kwargs)
+        super().__init__(
+            {"message": "Пользователь успешно удален"},
+            status_code,
+            **kwargs
+            )
 
 
 class BadDeleteResponse(ApiResponse):
     def __init__(
             self,
-            data,
+            data = None,
             status_code: status = status.HTTP_400_BAD_REQUEST,
             **kwargs
     ):
-        super().__init__(data, status_code, **kwargs)
+        super().__init__(
+            {"message": "Пользователя с данным id не существует."},
+            status_code, 
+            **kwargs
+            )
