@@ -52,7 +52,7 @@ class UsersSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
     email = serializers.EmailField(max_length=100)
     hashed_password = serializers.CharField(max_length=300)
-    role = serializers.IntegerField()
+    role = serializers.CharField()
 
 
 class UsersPasswordUpdateSerializer(serializers.Serializer):
