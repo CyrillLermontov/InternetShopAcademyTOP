@@ -1,7 +1,6 @@
 from rest_framework.decorators import action
 from drf_spectacular.utils import extend_schema, OpenApiTypes, OpenApiParameter
 
-
 from base.responses import SuccessGetResponse, BadGetResponse
 from .serializer import CategoriesSerializer
 from .models import Categories

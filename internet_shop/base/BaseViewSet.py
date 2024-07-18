@@ -64,5 +64,5 @@ class BaseViewSet(viewsets.ModelViewSet):
         if result is None:
             return BadDeleteResponse(data=[])
         BaseDAO.delete(self.model, pk)
-        serializer = self.serializer_class(result)
+        serializer = self.serializer_class(result[0])
         return SuccessDeleteResponse(data=serializer.data)

@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:13
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASS}
+
+  web:
+    build: .
+    command: bash -c "PYTHONPATH=/app alembic upgrade head && python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - ./internet_shop:/app
+      - ./database.py:/app/database.py
+      - ./alembic.ini:/app/alembic.ini
+      - ./migrations:/app/migrations
+    ports:
+      - "8000:8000"
+    environment:
+      - DJANGO_SETTINGS_MODULE=internet_shop.settings
+    env_file:
+      - .env
+    depends_on:
+      - db
+
+volumes:
+  postgres_data:

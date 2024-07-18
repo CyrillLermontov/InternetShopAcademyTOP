@@ -2,8 +2,8 @@ from database import session_maker
 import hashlib
 
 
-from internet_shop.authentication.models import Users
-from internet_shop.roles.models import Roles
+from internet_shop.authentication.models import Users # type: ignore
+from internet_shop.roles.models import Roles # type: ignore
 
 
 def reg_us():

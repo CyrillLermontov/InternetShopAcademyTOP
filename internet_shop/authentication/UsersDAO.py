@@ -1,4 +1,5 @@
-from sqlalchemy import select, join
+from sqlalchemy import select
+from sqlalchemy.orm import aliased
 
 from base.BaseDAO import BaseDAO
 from .models import Users
@@ -18,40 +19,54 @@ class UsersDAO(BaseDAO):
 
     @classmethod
     def find_all_users(cls) -> list:
-        users = cls.find_all(Users)
-        roles = cls.find_all(Roles)
-        roles_dict = {}
-        for role in roles:
-            roles_dict[role.id] = role.role_name
-        result = []
-        for u in users:
-            info = {
-                'id': u.id,
-                'email': u.email,
-                'hashed_password': u.hashed_password,
-                'role': roles_dict[u.role],
-            }
-            result.append(info)
+        with session_maker() as session:
+            roles_alias = aliased(Roles)
+            query = (
+            select(
+                Users.id,
+                Users.email,
+                Users.hashed_password,
+                roles_alias.role_name,
+            )
+            .select_from(Users)
+            .join(roles_alias, Users.role == roles_alias.id)
+            )
+            result = []
+            for row in session.execute(query):
+                info = {
+                    'id': row.id,
+                    'email': row.email,
+                    'hashed_password': row.hashed_password,
+                    'role': row.role_name,
+                }
+                result.append(info)
         return result
+    
     
     @classmethod
     def find_user_by_id(cls, id: int) -> list:
-        users = cls.find_by_id(Users, id)
-        if not users:
-            return None
-        roles = cls.find_all(Roles)
-        roles_dict = {}
-        for role in roles:
-            roles_dict[role.id] = role.role_name
-        result = []
-        for u in users:
-            info = {
-                'id': u.id,
-                'email': u.email,
-                'hashed_password': u.hashed_password,
-                'role': roles_dict[u.role],
-            }
-            result.append(info)
+        with session_maker() as session:
+            roles_alias = aliased(Roles)
+            query = (
+            select(
+                Users.id,
+                Users.email,
+                Users.hashed_password,
+                roles_alias.role_name,
+            )
+            .select_from(Users)
+            .join(roles_alias, Users.role == roles_alias.id)
+            .where(Users.id == id)
+            )
+            result = []
+            for row in session.execute(query):
+                info = {
+                    'id': row.id,
+                    'email': row.email,
+                    'hashed_password': row.hashed_password,
+                    'role': row.role_name,
+                }
+                result.append(info)
         return result
 
 

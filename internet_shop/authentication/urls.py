@@ -2,7 +2,6 @@ from django.urls import path, include
 
 from .views import RegisterView, LoginView, LogoutView, UserPasswordUpdateView, UsersViewWithParam, \
     UsersView
-from .router import router as authenticate_router
 
 urlpatterns = [
     path('register/', RegisterView.as_view(), name="register"),
@@ -11,5 +10,4 @@ urlpatterns = [
     path('users/', UsersView.as_view(), name="users"),
     path('users/<int:id>/', UsersViewWithParam.as_view(), name="users_retrieve"),
     path('change_password/<int:id>/', UserPasswordUpdateView.as_view(), name="change_password"),
-    path('', include(authenticate_router.urls)),
 ]

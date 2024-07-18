@@ -4,3 +4,4 @@ venv
 .idea
 migrations
 __pycache__
+.vscode

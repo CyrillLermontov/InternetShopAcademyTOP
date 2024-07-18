@@ -1,6 +1,5 @@
 from rest_framework.response import Response
 from rest_framework import status
-import json
 
 
 class ApiResponse(Response):
@@ -96,7 +95,7 @@ class SuccessDeleteResponse(ApiResponse):
             **kwargs
     ):
         super().__init__(
-            {"message": "Пользователь успешно удален"},
+            data,
             status_code,
             **kwargs
             )
@@ -110,7 +109,7 @@ class BadDeleteResponse(ApiResponse):
             **kwargs
     ):
         super().__init__(
-            {"message": "Пользователя с данным id не существует."},
+            data,
             status_code, 
             **kwargs
             )

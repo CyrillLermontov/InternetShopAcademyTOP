@@ -1,4 +1,5 @@
 from sqlalchemy import select
+from sqlalchemy.orm import aliased
 
 from base.BaseDAO import BaseDAO
 from .models import OrderHistory
@@ -9,43 +10,59 @@ from database import session_maker
 class OrderHistoryDAO(BaseDAO):
     @classmethod
     def find_all_orders(cls) -> list:
-        orders = cls.find_all(OrderHistory)
-        products = cls.find_all(Products)
-        products_dict = {}
-        for product in products:
-            products_dict[product.id] = product.product_name
-        result = []
-        for order in orders:
-            info = {
-                'id': order.id,
-                'product': products_dict[order.product],
-                'date': order.date,
-                'quantity': order.quantity,
-                'full_cost': order.full_cost,
-                'client': order.client,
-            }
-            result.append(info)
+        with session_maker() as session:
+            products_alias = aliased(Products)
+            query = (
+            select(
+                OrderHistory.id,
+                OrderHistory.date,
+                OrderHistory.quantity,
+                OrderHistory.full_cost,
+                OrderHistory.client,
+                products_alias.product_name,
+            )
+            .select_from(OrderHistory)
+            .join(products_alias, OrderHistory.product == products_alias.id)
+            )
+            result = []
+            for row in session.execute(query):
+                info = {
+                    'id': row.id,
+                    'product': row.product_name,
+                    'date': row.date,
+                    'quantity': row.quantity,
+                    'full_cost': row.full_cost,
+                    'client': row.client,
+                }
+                result.append(info)
         return result
     
-
     @classmethod
     def find_order_by_id(cls, id: int) -> list:
-        orders = cls.find_by_id(OrderHistory, id)
-        if not orders:
-            return None
-        products = cls.find_all(Products)
-        products_dict = {}
-        for product in products:
-            products_dict[product.id] = product.product_name
-        result = []
-        for order in orders:
-            info = {
-                'id': order.id,
-                'product': products_dict[order.product],
-                'date': order.date,
-                'quantity': order.quantity,
-                'full_cost': order.full_cost,
-                'client': order.client,
-            }
-            result.append(info)
+        with session_maker() as session:
+            products_alias = aliased(Products)
+            query = (
+            select(
+                OrderHistory.id,
+                OrderHistory.date,
+                OrderHistory.quantity,
+                OrderHistory.full_cost,
+                OrderHistory.client,
+                products_alias.product_name,
+            )
+            .select_from(OrderHistory)
+            .join(products_alias, OrderHistory.product == products_alias.id)
+            .where(OrderHistory.id == id)
+            )
+            result = []
+            for row in session.execute(query):
+                info = {
+                    'id': row.id,
+                    'product': row.product_name,
+                    'date': row.date,
+                    'quantity': row.quantity,
+                    'full_cost': row.full_cost,
+                    'client': row.client,
+                }
+                result.append(info)
         return result

@@ -6,10 +6,15 @@ import datetime
 import jwt
 import hashlib
 
-from base.responses import SuccessPutResponse, BadPutResponse, SuccessGetResponse, \
-    BadGetResponse, SuccessDeleteResponse, BadDeleteResponse, BadPostResponse, SuccessPostResponse
-from .serializers import RegisterSerializer, LoginSerializer, UsersSerializer, \
-    UsersPasswordUpdateSerializer
+from base.responses import (
+    SuccessPutResponse, BadPutResponse, SuccessGetResponse, 
+    BadGetResponse, SuccessDeleteResponse, BadDeleteResponse, 
+    BadPostResponse, SuccessPostResponse
+)
+from .serializers import (
+    RegisterSerializer, LoginSerializer, 
+    UsersSerializer, UsersPasswordUpdateSerializer
+)
 from .models import Users
 from database import session_maker
 from authentication.dependencies import role_required
@@ -121,9 +126,9 @@ class UsersViewWithParam(APIView):
         pk = kwargs.get('id')
         user = UsersDAO.find_by_id(self.model, pk)
         if not user:
-            return BadDeleteResponse()
+            return BadDeleteResponse(data={"message": "Данного пользователя не существует."})
         UsersDAO.delete(self.model, pk)
-        return SuccessDeleteResponse()
+        return SuccessDeleteResponse(data={"message": "Пользователь успешно удален."})
     
     @role_required(5)
     def put(self, request, *args, **kwargs):
